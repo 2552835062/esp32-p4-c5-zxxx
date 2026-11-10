@@ -1,0 +1,42 @@
+# 构建产物 / 依赖
+build/
+managed_components/
+dependencies.lock
+sdkconfig
+sdkconfig.old
+sdkconfig.ci
+
+# 第三方 / 官方二进制，不提交
+components/esp-serial-flasher/
+main/c5_firmware/
+main/c5_sdio_flasher.c
+main/c5_sdio_flasher.h
+
+# 生成的字体（约 34MB，用 tools/gen_font.py 重新生成）
+components/music_lyrics/fonts/lyrics_font_44.c
+tools/.font_build/
+
+# IDE 本地配置，不提交
+.vscode/
+
+# 密码 / 密钥 / Token
+.env
+.env.*
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+secrets.*
+
+# 运行日志 / 缓存
+__pycache__/
+*.pyc
+*.log
+tools/music_agent/agent.log
+tools/music_agent/agent.err.log
+tools/music_agent/__pycache__/
+
+# 临时文件 / 对话记录
+*.zip
+prompt.txt

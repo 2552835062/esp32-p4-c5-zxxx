@@ -1,0 +1,10 @@
+dependencies:
+  # P4 + C5：P4 作为 host，通过 SDIO 运行 ESP-Hosted；WiFi API 走 esp_wifi_remote。
+  espressif/esp_hosted: "2.12.9"
+  espressif/esp_wifi_remote: "1.6.1"
+  # LVGL 9.2.x 与参考工程一致
+  lvgl/lvgl: "~9.2"
+  # IDF v6 移除内置 cJSON，改用组件注册表版本
+  espressif/cjson: "^1.7.19"
+  idf:
+    version: ">=5.5.3"

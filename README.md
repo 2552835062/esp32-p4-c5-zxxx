@@ -44,19 +44,16 @@
 ```text
 esp32-p4-c5-zxxx/
 ├─ CMakeLists.txt                 # ESP-IDF 工程入口
-├─ partitions.csv                 # 16MB flash，factory 10MB（字体 + C5 固件）
+├─ partitions.csv                 # 16MB flash，factory 10MB（字体 + 应用）
 ├─ sdkconfig.defaults             # P4X/C5/PSRAM/LVGL 默认配置
 ├─ main/
 │  ├─ main.c                      # NVS -> 屏幕 -> LVGL -> C5/WiFi 启动流程
 │  ├─ axs15260_lcd.c/.h           # AXS15260 MIPI-DSI 面板与背光初始化
 │  ├─ lvgl_port.c/.h              # 1280x452、90 度旋转、触摸、LVGL 任务
-│  ├─ c5_sdio_flasher.c/.h        # P4 通过 SDIO 首次烧录 C5
-│  ├─ c5_firmware/*.bin           # ESP-Hosted-MCU 2.12.9 四段镜像
-│  ├─ Kconfig.projbuild           # WiFi SSID/密码、C5 首刷选项
+│  ├─ Kconfig.projbuild           # WiFi SSID/密码
 │  └─ idf_component.yml           # esp_hosted / esp_wifi_remote / lvgl / cjson
 ├─ components/
-│  ├─ esp_lcd_axs15260/           # 面板 + 触摸驱动（复用已验证组件）
-│  ├─ esp-serial-flasher/         # C5 首刷依赖（ESP-IDF 官方组件）
+│  ├─ esp_lcd_axs15260/           # 面板 + 触摸驱动（复用已验证组件，Apache-2.0）
 │  └─ music_lyrics/
 │     ├─ include/
 │     │  ├─ lyrics_ui.h           # 页面接口
@@ -69,12 +66,15 @@ esp32-p4-c5-zxxx/
 │     ├─ music_lyric.c            # LRC 解析（纯 C）
 │     ├─ music_state.c            # 状态快照 + 内置演示歌单/LRC
 │     ├─ music_remote.c           # UDP 发现 + HTTP /state /lyrics /cmd
-│     └─ fonts/lyrics_font_44.c   # 44px CJK 字体（6763 字 + ASCII/假名/标点）
+│     └─ fonts/README.md          # 字体生成说明（34MB 字体不进仓库）
 ├─ tools/
+│  ├─ gen_font.py                 # 生成 44px CJK 字体
 │  └─ music_agent/                # Windows 网易云代理（MIT）
 │     ├─ music_agent.py
 │     ├─ requirements.txt
+│     ├─ run_agent.bat
 │     └─ README.md
+├─ docs/                          # 设计图和实机参考图
 └─ README.md
 ```
 
@@ -101,6 +101,7 @@ esp32-p4-c5-zxxx/
 
 ```bash
 cd esp32-p4-c5-zxxx
+python tools/gen_font.py          # 首次克隆后生成 44px CJK 字体
 idf.py set-target esp32p4
 idf.py menuconfig
 ```
@@ -108,9 +109,10 @@ idf.py menuconfig
 在 `歌词显示屏（ESP32-P4C5 + AXS15260）` 菜单里填写：
 
 - `WiFi SSID`：电脑和板子所在的同一个 2.4GHz/5GHz 局域网；
-- `WiFi 密码`；
-- 如果板子上的 C5 已经是 ESP-Hosted-MCU 2.12.9 固件，可以关闭
-  `首次启动时通过 SDIO 烧录 C5 固件`；空片 C5 保持开启。
+- `WiFi 密码`。
+
+C5 需要预先烧录 ESP-Hosted-MCU 2.12.9 固件；本仓库不包含 C5 固件和首刷工具。
+如果 C5 是空片，可先使用参考工程 `aibox-p4xc5` 的 C5 首刷流程烧录一次。
 
 编译并烧录：
 
@@ -133,8 +135,9 @@ phy_init, data, phy,     0xf000,   0x1000,
 factory,  app,  factory, 0x10000,  10M,
 ```
 
-- CJK 字体约 6.5MB（未压缩位图），C5 四段固件约 1.3MB，其余为 IDF/LVGL/应用代码；
-- 16MB flash 留出约 5.9MB 余量；如果换成 4MB flash 的板子，需要把字体改小
+- 生成的 CJK 字体源文件约 34MB，编译进 flash 的未压缩位图数据约 5.6MB；
+  仓库不提交字体文件，首次构建前运行 `python tools/gen_font.py`；
+- 16MB flash 的 factory 分区为 10MB；如果换成 4MB flash 的板子，需要把字体改小
   （例如 28px/2bpp 或只保留常用 3500 字）。
 
 ### 4.3 首次启动日志
@@ -317,6 +320,8 @@ npx lv_font_conv --font C:/Windows/Fonts/Deng.ttf \
   可能拦截合成输入，可让两者权限一致。
 - 板端不播放音频；如果后续要在板上出声，需要增加 ESP-ADF/解码器和网络流，
   这是另一个量级的工程。
+- C5 必须预先烧录 ESP-Hosted-MCU 2.12.9 固件；仓库不提交 C5 四段固件，也不包含
+  SDIO 首刷工具。参考工程 `aibox-p4xc5` 里有完整的 C5 首刷实现。
 - 本工程按 ESP32-P4X rev v3.x + 1-bit SDIO 的 P4X 板配置；旧 v1.x 板或 4-bit
   SDIO 板需要改 `sdkconfig.defaults` 里的 `CONFIG_ESP32P4_*` 和 Hosted 引脚/位宽。
 

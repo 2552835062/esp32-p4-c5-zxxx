@@ -1,0 +1,8 @@
+aiohttp>=3.9
+pillow>=10.0
+winrt-Windows.Media.Control>=2.3.0
+winrt-Windows.Storage.Streams>=2.3.0
+winrt-Windows.Foundation>=2.3.0
+
+# Windows 音频会话峰值：判断网易云是否真的在播放/暂停
+pycaw>=20240205

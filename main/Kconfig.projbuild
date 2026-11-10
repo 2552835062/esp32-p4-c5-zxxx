@@ -1,0 +1,14 @@
+menu "歌词显示屏（ESP32-P4C5 + AXS15260）"
+
+    config P4_WIFI_STA_SSID
+        string "WiFi SSID（留空则只跑演示模式）"
+        default ""
+        help
+            歌词页通过 WiFi 加入局域网，自动发现电脑端 music_agent.py。
+            留空时不初始化 C5/WiFi，界面使用内置演示歌单。
+
+    config P4_WIFI_STA_PASSWORD
+        string "WiFi 密码"
+        default ""
+
+endmenu

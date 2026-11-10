@@ -1,0 +1,6 @@
+# ESP32-P4C5 歌词显示屏分区表（16MB flash）
+# CJK 字体约 4MB + C5 四段固件约 1.3MB，factory 给 10MB。
+# Name,   Type, SubType, Offset,   Size
+nvs,      data, nvs,     0x9000,   0x6000,
+phy_init, data, phy,     0xf000,   0x1000,
+factory,  app,  factory, 0x10000,  10M,
